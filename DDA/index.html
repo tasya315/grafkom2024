@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Gambar Garis</title>
+    </head>
+    <body>
+        <script>
+            const canvas = document.createElement("canvas");
+            canvas.width = 512;
+            canvas.height = 512;
+            canvas.style.border = "1px solid black";
+            document.body.appendChild(canvas);
+
+            const context = canvas.getContext("2d");
+            let clickCount = 0;
+            let startX, startY, endX, endY;
+            let points = [];
+
+            canvas.addEventListener("click", (event) => {
+                clickCount++;
+                if (clickCount === 1) {
+                    startX = event.offsetX;
+                    startY = event.offsetY;
+                } else if (clickCount === 2) {
+                    endX = event.offsetX;
+                    endY = event.offsetY;
+
+                    const dx = endX - startX;
+                    const dy = endY - startY;
+                    const steps = Math.max(Math.abs(dx), Math.abs(dy));
+                    const xIncrement = dx / steps;
+                    const yIncrement = dy / steps;
+
+                    let x = startX;
+                    let y = startY;
+                    for (let i = 0; i <= steps; i++) {
+                        context.fillRect(Math.round(x), Math.round(y), 1, 1);
+                        x += xIncrement;
+                        y += yIncrement;
+                    }
+
+                    clickCount = 0;
+                } else if (clickCount === 3) {
+                    clickCount = 0;
+                }
+            });
+
+            canvas.addEventListener("mousedown", (event) => {
+                const x = event.offsetX;
+                const y = event.offsetY;
+
+                if (clickCount === 0) {
+                    points.push({ x, y });
+                }
+
+                canvas.addEventListener("dblclick", (event) => {
+                    const x = event.offsetX;
+                    const y = event.offsetY;
+
+                    for (let i = 0; i < points.length; i++) {
+                        const point = points[i];
+                        const distance = Math.sqrt(
+                            (point.x - x) ** 2 + (point.y - y) ** 2
+                        );
+                        if (distance < 5) {
+                            points.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < points.length; i++) {
+                        const point = points[i];
+                        context.beginPath();
+                        context.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                        context.fill();
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
