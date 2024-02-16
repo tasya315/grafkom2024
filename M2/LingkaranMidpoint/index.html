@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Circle Drawer</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="circleCanvas" width="600" height="400"></canvas>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Get the canvas element and context
+                const canvas = document.getElementById("circleCanvas");
+                const ctx = canvas.getContext("2d");
+
+                let centerX, centerY, radius;
+                let isFirstClick = true;
+
+                canvas.addEventListener("click", function (event) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+
+                    if (isFirstClick) {
+                        // First click: Set center point
+                        centerX = x;
+                        centerY = y;
+                        isFirstClick = false;
+                        console.log(
+                            "Center Point set: (" +
+                                centerX +
+                                ", " +
+                                centerY +
+                                ")"
+                        );
+                    } else {
+                        // Second click: Set radius and draw circle
+                        radius = Math.sqrt(
+                            Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+                        );
+                        drawCircle();
+                        isFirstClick = true;
+                        console.log("Radius set: " + radius);
+                    }
+                });
+
+                function drawCircle() {
+                    // Draw the circle using midpoint circle drawing algorithm
+                    let x = radius;
+                    let y = 0;
+                    let err = 0;
+
+                    while (x >= y) {
+                        plotPoints(centerX, centerY, x, y);
+
+                        if (err <= 0) {
+                            y++;
+                            err += 2 * y + 1;
+                        }
+
+                        if (err > 0) {
+                            x--;
+                            err -= 2 * x + 1;
+                        }
+                    }
+                }
+
+                function plotPoints(cx, cy, x, y) {
+                    // Plot points for all octants
+                    ctx.fillRect(cx + x, cy + y, 1, 1);
+                    ctx.fillRect(cx - x, cy + y, 1, 1);
+                    ctx.fillRect(cx + x, cy - y, 1, 1);
+                    ctx.fillRect(cx - x, cy - y, 1, 1);
+                    ctx.fillRect(cx + y, cy + x, 1, 1);
+                    ctx.fillRect(cx - y, cy + x, 1, 1);
+                    ctx.fillRect(cx + y, cy - x, 1, 1);
+                    ctx.fillRect(cx - y, cy - x, 1, 1);
+                }
+            });
+        </script>
+    </body>
+</html>

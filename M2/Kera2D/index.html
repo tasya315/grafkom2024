@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>3D to 2D Projection</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas" width="600" height="500"></canvas>
+        <script>
+            // Fetch the .obj file
+            fetch("kera.obj")
+                .then((response) => response.text())
+                .then((data) => {
+                    // Parse the .obj file to extract the vertices
+                    let lines = data.split("\n");
+                    let vertices = lines
+                        .filter((line) => line.split(" ")[0] == "v")
+                        .map((line) => {
+                            let parts = line.split(" ");
+                            return {
+                                x: parseFloat(parts[1]),
+                                y: parseFloat(parts[2]),
+                                z: parseFloat(parts[3]),
+                            };
+                        });
+
+                    // Project the 3D points to 2D
+                    let points2D = vertices.map((vertex) => {
+                        return {
+                            x: vertex.x,
+                            y: vertex.y,
+                        };
+                    });
+
+                    // Get the canvas and context
+                    let canvas = document.getElementById("canvas");
+                    let ctx = canvas.getContext("2d");
+
+                    // Draw the 2D points on the canvas
+                    points2D.forEach((point) => {
+                        ctx.beginPath();
+                        ctx.arc(
+                            300 - point.x * 175,
+                            250 - point.y * 175,
+                            0.5,
+                            0,
+                            2 * Math.PI
+                        );
+                        ctx.fill();
+                    });
+                });
+        </script>
+    </body>
+</html>

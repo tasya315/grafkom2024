@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Line Drawer</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="lineCanvas" width="600" height="400"></canvas>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Get the canvas element and context
+                const canvas = document.getElementById("lineCanvas");
+                const ctx = canvas.getContext("2d");
+
+                let startX, startY, endX, endY;
+                let isFirstClick = true;
+
+                canvas.addEventListener("click", function (event) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+
+                    if (isFirstClick) {
+                        // First click: Set the starting point of the line
+                        startX = x;
+                        startY = y;
+                        isFirstClick = false;
+                        console.log(
+                            "Starting Point set: (" +
+                                startX +
+                                ", " +
+                                startY +
+                                ")"
+                        );
+                    } else {
+                        // Second click: Set the ending point and draw the line
+                        endX = x;
+                        endY = y;
+                        drawLine();
+                        isFirstClick = true;
+                        console.log(
+                            "Ending Point set: (" + endX + ", " + endY + ")"
+                        );
+                    }
+                });
+
+                function drawLine() {
+                    // Draw the line using Bresenham's line algorithm
+                    let dx = Math.abs(endX - startX);
+                    let dy = Math.abs(endY - startY);
+                    let sx = startX < endX ? 1 : -1;
+                    let sy = startY < endY ? 1 : -1;
+                    let err = dx - dy;
+
+                    while (true) {
+                        ctx.fillRect(startX, startY, 1, 1);
+
+                        if (startX === endX && startY === endY) {
+                            break;
+                        }
+
+                        let e2 = 2 * err;
+                        if (e2 > -dy) {
+                            err -= dy;
+                            startX += sx;
+                        }
+
+                        if (e2 < dx) {
+                            err += dx;
+                            startY += sy;
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
